@@ -125,30 +125,48 @@ echo -e "\033]6;1;bg;blue;brightness;33\a"
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-
-alias db="pgcli -d sisu_webapp_db"
-
-alias snapshot="poetry run pytest -n0 -k snapshot; poetry run pytest -n0 -k snapshot"
-
-alias format="poetry run ./scripts/format.sh --fix"
-
 # alias for git
 # more at: https://kapeli.com/cheat_sheets/Oh-My-Zsh_Git.docset/Contents/Resources/Documents/index
-
 set_upstream () {
 	CURRENT_BRANCH=$(git branch --show-current)
 	git branch --set-upstream-to="origin/$CURRENT_BRANCH" $CURRENT_BRANCH > /dev/null
 }
 
+latest_branches() {
+        n='5'
+
+        print_usage() {
+                printf "Usage: latest_branches [-n numbranches]"
+        }
+
+        while getopts 'n:' flag; do
+                case "${flag}" in
+                        n) n="${OPTARG}" ;;
+                        *) print_usage
+                                exit 1 ;;
+                esac
+        done
+
+        git reflog | grep checkout | cut -d " " -f 8 | awk '!a[$0]++' | head -n"${n}" | cat -n
+}
+
 alias g="git"
 alias ga="git add"
 alias gaa="git add ."
+
 alias gb="git branch"
 alias gcob="git checkout -b"
+alias glb="latest_branches"
+alias gcom="git checkout master"
+
 alias gcmsg="git commit -m"
 alias gco="git checkout"
-alias gcom="git checkout master"
+
+alias gstatus="nocorrect git status"
+
 alias gpull="set_upstream && git pull"
 alias gpush="git push origin HEAD"
-alias status="nocorrect git status"
+alias gpushf="git push origin HEAD"
+
+alias gall="git add .; git commit -m 'update'; git push"
 
